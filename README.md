@@ -1,1 +1,1 @@
-# SpanishLexiconAPI
+# SpanishConjugationAPI
