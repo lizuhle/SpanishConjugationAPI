@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # SpanishLexiconAPI
 
 ### Use Cases
@@ -22,3 +23,6 @@
 
 
 
+=======
+# SpanishConjugationAPI
+>>>>>>> 4745ae3963eee1a5606387b9ac23997845840cf0
