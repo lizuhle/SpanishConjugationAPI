@@ -12,10 +12,10 @@
 
 <form id="form1">
     <div class="input-group">
-        <label for="word">Verb: </label>
-        <input id="word" name="word" type="text"/>
+        <label for="verb">Verb: </label>
+        <input id="verb" name="verb" type="text"/>
     </div>
-    <button type="submit" value="parse">Submit</button>
+    <button type="submit" value="conjugate">Submit</button>
 </form>
 <pre id="response"></pre>
 </body>
@@ -26,7 +26,7 @@
 
     const data = new FormData(event.target);
     const value = Object.fromEntries(data.entries());
-    value.word = data.get("word");
+    value.verb = data.get("verb");
     console.log({value});
 
     const response = await fetch('http://localhost:5000/conjugate', {
