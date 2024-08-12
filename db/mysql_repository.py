@@ -1,64 +1,54 @@
 import mysql.connector
-from model.verbconj import *
+from model.verbconj import Verb, Person, Tense
 
 
 class MysqlRepository:
 
     def __init__(self):
-        super().__init__()
         config = {
-            'user': 'root',
-            'password': 'root',
+            'user': 'liz',
+            'password': 'Spanconj123!',
             'host': 'localhost',
-            'port': '32000',
+            'port': '3306',
             'database': 'spanishconj'
         }
         self.connection = mysql.connector.connect(**config)
         self.cursor = self.connection.cursor()
 
-    def __del__(self):
-        self.connection.close()
+    def map_tense(self, entry: dict) -> Tense:
+        tense_map = {
+            "present": Tense.PRESENT,
+        }
+        tense = entry.get('tense', '').lower()
+        tense_mapped = tense_map.get(tense)
+        return tense_mapped
+
+    def map_pronoun(self, entry: dict) -> Person:
+        pronoun_map = {
+            "yo": Person.FIRST_SINGULAR,
+            "tú": Person.SECOND_SINGULAR,
+            "él, ella, usted": Person.THIRD_SINGULAR,
+            "nosotros, nosotras": Person.FIRST_PLURAL,
+            "vosotros, vosotras": Person.SECOND_PLURAL,
+            "ellos, ellas, ustedes": Person.THIRD_PLURAL,
+            "vos": Person.VOS
+        }
+        pronoun = entry.get('person', '').lower()
+        pronoun_mapped = pronoun_map.get(pronoun)
+        return pronoun_mapped
 
     def create_tables(self):
         self.cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS verbs (
+                    CREATE TABLE IF NOT EXISTS verb_conjugations (
                         id INT AUTO_INCREMENT PRIMARY KEY,
-                        infinitive VARCHAR(50) NOT NULL
-                    )
-                """)
-        self.cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS spanishconj (
-                        id INT AUTO_INCREMENT PRIMARY KEY,
-                        verb_id INT,
-                        tense INT,
-                        person INT,
-                        conjugation VARCHAR(50),
-                        FOREIGN KEY (verb_id) REFERENCES verbs(id)
+                        verb VARCHAR(30),
+                        tense VARCHAR(30),
+                        person VARCHAR(50),
+                        conjugation VARCHAR(30)
                     )
                 """)
         self.connection.commit()
 
-    def insert_verb(self, verb: Verb):
-        sql = "INSERT INTO verbs (infinitive) VALUES (%s)"
-        self.cursor.execute(sql, (verb.infinitive,))
-        verb_id = self.cursor.lastrowid
-        for tense, persons in verb.get_all_conjugations().items():
-            for person, conjugation in persons.items():
-                sql = "INSERT INTO conjugations (verb_id, tense, person, conjugation) VALUES (%s, %s, %s, %s)"
-                self.cursor.execute(sql, (verb_id, tense.value, person.value, conjugation))
-        self.connection.commit()
-
-    def get_verb_by_infinitive(self, infinitive: str) -> Verb:
-        sql = "SELECT id FROM verbs WHERE infinitive = %s"
-        self.cursor.execute(sql, (infinitive,))
-        result = self.cursor.fetchone()
-        if not result:
-            return None
-        verb_id = result[0]
-        verb = Verb(infinitive)
-        sql = "SELECT tense, person, conjugation FROM conjugations WHERE verb_id = %s"
-        self.cursor.execute(sql, (verb_id,))
-        for tense, person, conjugation in self.cursor.fetchall():
-            verb.add_conjugation(Tense(tense), Person(person), conjugation)
-        return verb
-
+    # def __del__(self):
+    #     self.cursor.close()
+    #     self.connection.close()

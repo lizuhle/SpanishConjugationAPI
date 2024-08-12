@@ -21,19 +21,27 @@
 </body>
 
 <script>
-    document.getElementById("form1").addEventListener("submit", function(event) {
-        event.preventDefault(); // Prevent form from submitting the traditional way
+    async function handleSubmit1(event) {
+    event.preventDefault();
 
-        const verb = document.getElementById("word").value;
+    const data = new FormData(event.target);
+    const value = Object.fromEntries(data.entries());
+    value.word = data.get("word");
+    console.log({value});
 
-        fetch(`http://127.0.0.1:5000/conjugate?verb=${verb}`)
-            .then(response => response.json())
-            .then(data => {
-                const responseElement = document.getElementById("response");
-                responseElement.textContent = JSON.stringify(data, null, 2);
-            })
-    });
-
+    const response = await fetch('http://localhost:5000/conjugate', {
+        method: 'POST',
+        body: JSON.stringify(value),
+        headers: {
+            'Content-Type': 'application/json',
+            }
+        });
+    const myJson = await response.json();
+    console.log(myJson);
+    document.getElementById('response').textContent = JSON.stringify(myJson, undefined, 2);
+}
+const form1 = document.getElementById("form1");
+form1.addEventListener("submit", async (e) => handleSubmit1(e), false);
 </script>
 
 </html>
