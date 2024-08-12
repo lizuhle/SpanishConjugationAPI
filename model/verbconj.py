@@ -3,10 +3,6 @@ from enum import Enum
 
 class Tense(Enum):
     PRESENT = 1
-    PRETERITE = 2
-    IMPERFECT = 3
-    FUTURE = 4
-    CONDITIONAL = 5
 
 
 class Person(Enum):
@@ -20,11 +16,8 @@ class Person(Enum):
 
 
 class Verb:
-    def __init__(self, infinitive):
-        self.infinitive = infinitive
+    def __init__(self):
         self.conjugations = {}
-
-
 
     def add_conjugation(self, tense: Tense, person: Person, conjugation: str):
         if tense not in self.conjugations:
