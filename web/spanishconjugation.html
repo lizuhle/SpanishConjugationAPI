@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Spanish Conjugation API</title>
+</head>
+<body>
+
+<h1>Spanish Conjugation API</h1>
+
+<h2>Conjugate a verb</h2>
+
+<form id="form1">
+    <div class="input-group">
+        <label for="word">Verb: </label>
+        <input id="word" name="word" type="text"/>
+    </div>
+    <button type="submit" value="parse">Submit</button>
+</form>
+<pre id="response"></pre>
+</body>
+
+<script>
+    document.getElementById("form1").addEventListener("submit", function(event) {
+        event.preventDefault(); // Prevent form from submitting the traditional way
+
+        const verb = document.getElementById("word").value;
+
+        fetch(`http://127.0.0.1:5000/conjugate?verb=${verb}`)
+            .then(response => response.json())
+            .then(data => {
+                const responseElement = document.getElementById("response");
+                responseElement.textContent = JSON.stringify(data, null, 2);
+            })
+    });
+
+</script>
+
+</html>
