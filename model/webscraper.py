@@ -15,14 +15,15 @@ def scrape_conjugations(verb):
         conjugation = row.find('td')
         if pronoun and conjugation:
             conjugations.append((pronoun.get_text(strip=True), conjugation.get_text(strip=True)))
+    print(conjugations)
     return conjugations
 
 def insert_conjugations(conjugations):
     try:
         connection = mysql.connector.connect(
             host='localhost',
-            user='root',
-            password='root',
+            user='liz',
+            password='Spanconj123!',
             database='spanishconj'
         )
         cursor = connection.cursor()
@@ -39,8 +40,7 @@ def insert_conjugations(conjugations):
             conjugation_form = conjugation[1]
             cursor.execute(insert_conj, (verb, tense, person, conjugation_form))
         connection.commit()
-    except mysql.connector.Error as err:
-        print(f"Error: {err}")
+
     finally:
         if connection.is_connected():
             cursor.close()
@@ -51,4 +51,5 @@ if __name__ == "__main__" :
     verb = "hablar"
     conjugations = scrape_conjugations(verb)
     insert_conjugations(conjugations)
+
 
