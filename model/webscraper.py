@@ -1,6 +1,6 @@
 import requests
+import mysql.connector
 from bs4 import BeautifulSoup
-from model.verbconj import Verb, Tense, Person
 
 
 def scrape_conjugations(verb):
@@ -17,22 +17,38 @@ def scrape_conjugations(verb):
             conjugations.append((pronoun.get_text(strip=True), conjugation.get_text(strip=True)))
     return conjugations
 
-    # pronoun_to_person = {
-    #     "yo": Person.FIRST_SINGULAR,
-    #     "tú": Person.SECOND_SINGULAR,
-    #     "él, ella, usted": Person.THIRD_SINGULAR,
-    #     "nosotros, nosotras": Person.FIRST_PLURAL,
-    #     "vosotros, vosotras": Person.SECOND_PLURAL,
-    #     "ellos, ellas, ustedes": Person.THIRD_PLURAL
-    # }
-    #
-    # tense_map = {
-    #     "presente": Tense.PRESENT,
-    #     "preterito": Tense.PRETERITE,
-    #     "imperfecto": Tense.IMPERFECT,
-    #     "futuro": Tense.FUTURE,
-    #     "condicional": Tense.CONDITIONAL
-    # }
+def insert_conjugations(conjugations):
+    try:
+        connection = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            password='root',
+            database='spanishconj'
+        )
+        cursor = connection.cursor()
+
+        insert_conj = """
+        INSERT INTO verb_conjugations (verb, tense, person, conjugation)
+        VALUES (%s, %s, %s, %s)
+        """
+
+        for conjugation in conjugations:
+            verb = "hablar"
+            tense = "present"
+            person = conjugation[0]
+            conjugation_form = conjugation[1]
+            cursor.execute(insert_conj, (verb, tense, person, conjugation_form))
+        connection.commit()
+    except mysql.connector.Error as err:
+        print(f"Error: {err}")
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
+
 
 if __name__ == "__main__" :
-    scrape_conjugations("hablar")
+    verb = "hablar"
+    conjugations = scrape_conjugations(verb)
+    insert_conjugations(conjugations)
+
