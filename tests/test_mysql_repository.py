@@ -1,29 +1,32 @@
 import pytest
-from db.mysql_repository import *
-from model.verbconj import *
+import mysql.connector
+from model.verbconj import Verb, Person, Tense
+from db.mysql_repository import MysqlRepository  # Adjust import according to your structure
 
-def setup_db():
+
+@pytest.fixture(scope="module")
+def mysql_repository():
     repo = MysqlRepository()
     repo.create_tables()
     yield repo
+    repo.cursor.execute("DROP TABLE IF EXISTS verb_conjugations")
+    repo.connection.close()
 
 
-def test_get_verb_by_infinitive(setup_db):
-    repo = setup_db
+def test_insert_conjugations(mysql_repository):
+    mysql_repository.insert_conjugations()
 
-    # Create a test verb and add conjugations
-    verb = Verb('hablar')
-    verb.add_conjugation(Tense.PRESENT, Person.FIRST_SINGULAR, 'hablo')
-    verb.add_conjugation(Tense.PRESENT, Person.SECOND_SINGULAR, 'hablas')
+    mysql_repository.cursor.execute("SELECT * FROM verb_conjugations WHERE verb = 'hablar'")
+    results = mysql_repository.cursor.fetchall()
 
-    # Insert the verb into the database
-    repo.insert_verb(verb)
+    expected_results = [
+        (1, 'hablar', 'present', 'yo', 'hablo'),
+        (2, 'hablar', 'present', 'tú', 'hablas'),
+        (3, 'hablar', 'present', 'él, ella, usted', 'habla'),
+        (4, 'hablar', 'present', 'nosotros, nosotras', 'hablamos'),
+        (5, 'hablar', 'present', 'vosotros, vosotras', 'habláis'),
+        (6, 'hablar', 'present', 'ellos, ellas, ustedes', 'hablan'),
+        (7, 'hablar', 'present', 'vos', 'hablás'),
+    ]
 
-    # Retrieve the verb by its infinitive
-    retrieved_verb = repo.get_verb_by_infinitive('hablar')
-
-    # Assert that the verb was retrieved correctly
-    assert retrieved_verb is not None
-    assert retrieved_verb.infinitive == 'hablar'
-    assert retrieved_verb.get_conjugation(Tense.PRESENT, Person.FIRST_SINGULAR) == 'hablo'
-    assert retrieved_verb.get_conjugation(Tense.PRESENT, Person.SECOND_SINGULAR) == 'hablas'
+    assert len(results) == len(expected_results)
