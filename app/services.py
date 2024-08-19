@@ -6,27 +6,29 @@ class Services:
     def __init__(self):
         self.repo = db.mysql_repository.MysqlRepository()
 
-    #Rete
-    def generate_conj(self):
+    def generate_conj(self, inf_verb: str):
         verb = Verb()
-        query = "SELECT tense, person, conjugation FROM verb_conjugations WHERE verb = 'hablar'"
-        self.repo.cursor.execute(query)
+        query = "SELECT tense, person, conjugation FROM verb_conjugations WHERE verb = %s"
+        self.repo.cursor.execute(query, (inf_verb,))
         results = self.repo.cursor.fetchall()
+
         for tense_str, person_str, conjugation in results:
             tense = self.repo.map_tense({'tense': tense_str})
             person = self.repo.map_pronoun({'person': person_str})
             if tense and person:
                 verb.add_conjugation(tense, person, conjugation)
-        return verb
 
-    def print_conj(self):
-        conjugations = self.generate_conj().get_all_conjugations()
+        conjugations = verb.get_all_conjugations()
         for tense, persons in conjugations.items():
             print(f"Tense: {tense.name}")
             for person, conjugation in persons.items():
                 print(f"  {person.name}: {conjugation}")
 
+        return verb
+
+
 if __name__ == "__main__" :
     service = Services()
-    service.print_conj()
+    verb_conj = service.generate_conj('hablar')
+
 
