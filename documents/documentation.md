@@ -6,8 +6,7 @@
 
 `pip install -r requirements.txt`
 
-
-2. Run the file `setup_db.py` to create the mySQL database.
+2. Run `setup_db.py` to create the mySQL database.
 
 
 3. Begin running the Flask API in the file `app.py`.

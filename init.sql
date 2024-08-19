@@ -1,12 +1,13 @@
+DROP DATABASE IF EXISTS spanishconj;
 CREATE DATABASE spanishconj;
-ALTER DATABASE spanishconj CHARACTER SET utf8mb4 COLLATE utf8_unicode_ci;
 USE spanishconj;
 
+DROP TABLE IF EXISTS verb_conjugations;
 CREATE TABLE verb_conjugations (
     id INT NOT NULL AUTO_INCREMENT,
     verb VARCHAR(30),
     tense VARCHAR(30),
-    person VARCHAR(20),
+    person VARCHAR(50),
     conjugation VARCHAR(30),
     CONSTRAINT PRIMARY KEY (id)
 );

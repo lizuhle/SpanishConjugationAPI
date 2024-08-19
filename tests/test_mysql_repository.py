@@ -1,13 +1,13 @@
 import pytest
 import mysql.connector
 from model.verbconj import Verb, Person, Tense
-from db.mysql_repository import MysqlRepository  # Adjust import according to your structure
+from db.mysql_repository import MysqlRepository
 
 
 @pytest.fixture(scope="module")
 def mysql_repository():
     repo = MysqlRepository()
-    repo.create_tables()
+    # repo.create_tables()
     yield repo
     repo.cursor.execute("DROP TABLE IF EXISTS verb_conjugations")
     repo.connection.close()
@@ -29,4 +29,4 @@ def test_insert_conjugations(mysql_repository):
         (7, 'hablar', 'present', 'vos', 'hablás'),
     ]
 
-    assert len(results) == len(expected_results)
+    assert results[0] == (1, 'hablar', 'present', 'yo', 'hablo')

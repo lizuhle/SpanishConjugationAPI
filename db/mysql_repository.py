@@ -49,6 +49,25 @@ class MysqlRepository:
                 """)
         self.connection.commit()
 
-    # def __del__(self):
-    #     self.cursor.close()
-    #     self.connection.close()
+    def insert_conjugation(self, verb: str, tense: str, person: str, conjugation: str):
+        query = """
+            INSERT INTO verb_conjugations (verb, tense, person, conjugation)
+            VALUES (%s, %s, %s, %s)
+        """
+        values = (verb, tense, person, conjugation)
+        self.cursor.execute(query, values)
+        self.connection.commit()
+
+    def insert_conjugations(self):
+        conjugations = [
+            ('hablar', 'present', 'yo', 'hablo'),
+            ('hablar', 'present', 'tú', 'hablas'),
+            ('hablar', 'present', 'él, ella, usted', 'habla'),
+            ('hablar', 'present', 'nosotros, nosotras', 'hablamos'),
+            ('hablar', 'present', 'vosotros, vosotras', 'habláis'),
+            ('hablar', 'present', 'ellos, ellas, ustedes', 'hablan'),
+            ('hablar', 'present', 'vos', 'hablás'),
+        ]
+
+        for conjugation in conjugations:
+            self.insert_conjugation(*conjugation)

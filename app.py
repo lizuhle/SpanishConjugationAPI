@@ -24,8 +24,6 @@ def conjugate_verb():
 
     formatted_conjugations = {}
     for tense, persons in conjugations.items():
-        # sorted_person = dict(sorted(persons.items(), key=lambda item: item[0].value))
-        # formatted_conjugations[tense.name] = sorted_person
         formatted_conjugations[tense.name] = {person.name: conjugation for person, conjugation in persons.items()}
 
     return jsonify(formatted_conjugations)
